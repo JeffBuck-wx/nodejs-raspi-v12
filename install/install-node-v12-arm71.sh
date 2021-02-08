@@ -17,13 +17,14 @@ then
   echo ""
   echo "Usage: $0 <mode>"
   echo "    mode = gz | xz"
-  exit 1
+  exit 2
 fi 
 
 echo "Using mode: $mode ($1)"
 ## install dir
-mkdir install
-cd install
+install_dir=src
+mkdir $install_dir
+cd $install_dir
 
 version=node-v12.20.1-linux-armv7l
 if [ "$mode" == "gz" ]
@@ -50,7 +51,7 @@ curl --silent  https://nodejs.org/dist/latest-v12.x/SHASUMS256.txt --stderr - | 
 if ! sha256sum --check $sum_check
 then
   echo "Check sum failed. Script exiting as a security precaution."
-  exit 2
+  exit 3
 fi
 
 ## unpack the src
@@ -61,9 +62,13 @@ cp -R ${version}/* /usr/local/
 
 ## clean up install files
 cd ..
-rm -fr install
+rm -fr $install_dir
 
 ## verify install
-node -v 
-npm -v
+if node -v && npm -v
+then
+  exit 0  
+else
+  exit 4
+fi
 
